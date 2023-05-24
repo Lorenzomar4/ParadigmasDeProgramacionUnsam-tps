@@ -10,10 +10,11 @@ from sklearn import metrics
 from sklearn.preprocessing import LabelEncoder
 
 
+
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import make_column_transformer
 from statistics import mean
-
+import statsmodels.api as sm
 
 class Prediccion:
 
@@ -28,45 +29,58 @@ class Prediccion:
     SL = 0.05
     X_Aux = None
     
-    def __init__(self, X , Y):
+    def __init__(self, archivo : str):
         self = self
-        self.X = X
-        self.Y = Y
-
+        self.df = archivo
+       
+    #1
     def asignarDataFrame(self,archivo) : 
         self.df = pd.read_csv(archivo)
 
-    ##1
-    def definirConjuntoDeVariablesIndependientesYDependientes(self,listaDeVarIndependientes : list, varDependiente: str):
-        self.X= df.loc[:,listaDeVarIndependientes] ## ['carat','cut','color','clarity','depth','table','x','y','z']
-        self.Y = df.loc[:,[str]]
-    ##1opcionalA
+    def obtenerListaDeColumnasDF(self):
+        return self.df.columns.tolist()
+    
+    def obtenerSoloListaDeVariablesIndependientes(self, dependiente : str) -> list:
+        columnas = self.obtenerListaDeColumnasDF()
+        columnas.remove(dependiente)
+        return columnas
+
+    ##2
+    def definirConjuntoDeVariablesIndependientesYDependientes(self : list, varDependiente: str):
+        listaDeVariablesIndependientes : list = self.obtenerSoloListaDeVariablesIndependientes(varDependiente)
+        self.X= df.loc[:,listaDeVariablesIndependientes] 
+        self.Y = df.loc[:,[varDependiente]]
+        
+
+    ##2opcionalA
     def columnasCategorica(self) :
         columnasNoNumericas = self.X.select_dtypes(exclude=['number'])
         columnasNoNumericas = columnasNoNumericas.columns.tolist()
         return columnasNoNumericas
-    
-    ##1opcionaB
-
+    ##2opcionaB
+    def conversionDeCategorioADummieNumerico(self) :
+        onehotencoder = make_column_transformer((OneHotEncoder(), self.columnasCategorica()), remainder = "passthrough")
+        self.X = onehotencoder.fit_transform(self.X)
+        self.X_Aux =self.X
         
-    ##1
+        #chequeamos el resultado observando una porción
+        return pd.concat([pd.DataFrame(self.X),df.iloc[:, :-1]], axis=1).head()
+      
+    ##3
     def divisionDeConjuntos(self) :
         self.X_train, self.X_test, self.y_train,self.y_test = train_test_split(self.X, self.Y, test_size=0.2, random_state=0)
 
-    ##2
+    ##4
     def entrenar(self) :
         self.regressor = LinearRegression()
         self.regressor.fit(self.X_train, self.y_train)
         
-    ##3
+    ##5
     def prediccion(self) :
         y_pred = self.regressor.predict(self.X_test).flatten()
         return y_pred
     
-    ##4
-        
-        
-    ##5
+    ##6
     def resultadoDeEntrenamiento(self) :
         y_pred = self.prediccion()
         y_test = np.ravel(self.y_test) ##EVITA ERRORES. 
@@ -78,7 +92,7 @@ class Prediccion:
         errorDePrediccion = 100-eficaciaDePrediccion
         dff = pd.DataFrame({'Actual': y_test, 'Prediccion':y_pred,"Diferencia": diferencia,"Diferencia porcentual %":diferenciaPorcentual,"Eficacia de prediccion %":eficaciaDePrediccion,"Error porcentual  de prediccion %":errorDePrediccion})
         return dff
-    
+    #7
     def graficoActualPrediccion(self):
         df1 = self.resultadoDeEntrenamiento()  
         df1 = df1.loc[:, ['Actual', 'Prediccion']].head(60)  
@@ -86,6 +100,11 @@ class Prediccion:
         plt.grid(which='major', linestyle='-', linewidth='0.5', color='green')
         plt.grid(which='minor', linestyle=':', linewidth='0.5', color='black')
         plt.show()
+
+    def pDeterminacion(self):
+        
+        regression_OLS = sm.OLS(endog = self.Y, exog = self.X_Aux).fit()
+        return regression_OLS.summary()
         
 
 df = pd.read_csv('diamonds.csv')
