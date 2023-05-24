@@ -48,8 +48,8 @@ class Prediccion:
     ##2
     def definirConjuntoDeVariablesIndependientesYDependientes(self : list, varDependiente: str):
         listaDeVariablesIndependientes : list = self.obtenerSoloListaDeVariablesIndependientes(varDependiente)
-        self.X= df.loc[:,listaDeVariablesIndependientes] 
-        self.Y = df.loc[:,[varDependiente]]
+        self.X= self.df.loc[:,listaDeVariablesIndependientes] 
+        self.Y = self.loc[:,[varDependiente]]
         
 
     ##2opcionalA
@@ -64,7 +64,7 @@ class Prediccion:
         self.X_Aux =self.X
         
         #chequeamos el resultado observando una porción
-        return pd.concat([pd.DataFrame(self.X),df.iloc[:, :-1]], axis=1).head()
+        return pd.concat([pd.DataFrame(self.X),self.df.iloc[:, :-1]], axis=1).head()
       
     ##3
     def divisionDeConjuntos(self) :
@@ -100,12 +100,9 @@ class Prediccion:
         plt.grid(which='major', linestyle='-', linewidth='0.5', color='green')
         plt.grid(which='minor', linestyle=':', linewidth='0.5', color='black')
         plt.show()
-
+    #8
     def pDeterminacion(self):
         
         regression_OLS = sm.OLS(endog = self.Y, exog = self.X_Aux).fit()
         return regression_OLS.summary()
         
-
-df = pd.read_csv('diamonds.csv')
-df
