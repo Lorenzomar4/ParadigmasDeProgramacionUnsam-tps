@@ -49,7 +49,7 @@ class Prediccion:
     def definirConjuntoDeVariablesIndependientesYDependientes(self : list, varDependiente: str):
         listaDeVariablesIndependientes : list = self.obtenerSoloListaDeVariablesIndependientes(varDependiente)
         self.X= self.df.loc[:,listaDeVariablesIndependientes] 
-        self.Y = self.loc[:,[varDependiente]]
+        self.Y = self.df.loc[:,[varDependiente]]
         
 
     ##2opcionalA
