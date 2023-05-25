@@ -28,6 +28,7 @@ class RegresionLineal:
     regressor = None
     SL = 0.05
     X_Aux = None
+    listaColumnaCategorica = None
     
     def __init__(self, archivo : str):
         self = self
@@ -56,23 +57,31 @@ class RegresionLineal:
     def columnasCategorica(self) :
         columnasNoNumericas = self.X.select_dtypes(exclude=['number'])
         columnasNoNumericas = columnasNoNumericas.columns.tolist()
+        self.listaColumnaCategorica= columnasNoNumericas
         return columnasNoNumericas
     ##2opcionaB
 
     ##2opcionAa 
- 
+    
+    def deCategoricoANumerico(self, columna):
+        labelencoder_X = LabelEncoder()
+        self.X[columna] = labelencoder_X.fit_transform(self.X[columna])
+        # Se emiten ambos grupos de datos para comparar
+        return pd.concat([pd.DataFrame(self.X[columna]),self.df[columna] ], axis=1).head()
+
 
 
 
 
     def conversionDeCategorioADummieNumerico(self) :
-        onehotencoder = make_column_transformer((OneHotEncoder(), self.columnasCategorica()), remainder = "passthrough")
+        onehotencoder = make_column_transformer((OneHotEncoder(), self.listaColumnaCategorica), remainder = "passthrough")
         self.X = onehotencoder.fit_transform(self.X)
         self.X_Aux =self.X
         
         #chequeamos el resultado observando una porción
-        return pd.concat([pd.DataFrame(self.X),self.df.iloc[:, :-1]], axis=1).head()
-      
+        return  self.X  ##pd.concat([pd.DataFrame(self.X),self.df.iloc[:, :-1]], axis=1).head()
+    def evitarTrampa(self)  :
+        self.X =  self.X[:,1:]
     ##3
     def divisionDeConjuntos(self) :
         self.X_train, self.X_test, self.y_train,self.y_test = train_test_split(self.X, self.Y, test_size=0.2, random_state=0)
@@ -102,7 +111,7 @@ class RegresionLineal:
     #7
     def graficoActualPrediccion(self):
         df1 = self.resultadoDeEntrenamiento()  
-        df1 = df1.loc[:, ['Actual', 'Prediccion']].head(60)  
+        df1 = df1.loc[:, ['Actual', 'Prediccion']].head(80)  
         df1.plot(kind='bar',figsize=(20,10))
         plt.grid(which='major', linestyle='-', linewidth='0.5', color='green')
         plt.grid(which='minor', linestyle=':', linewidth='0.5', color='black')
@@ -126,8 +135,6 @@ class RegresionLineal:
         df.drop('index', axis=1, inplace=True)
         # Asignar índices numéricos basados en la ubicación
         df.index = range(len(df))
-
-
         return df
     
     def todosLosPQueSuperaAlSL(self) :
@@ -143,10 +150,16 @@ class RegresionLineal:
     def XAuxAsignacion(self) :
         self.X = self.X_Aux
 
-    def realizarEntrenamientoCompleto(self) :
+    def realizarEntrenamientoCompleto(self,conEscalado) :
+
         self.divisionDeConjuntos()
         self.entrenar()
         self.prediccion()
+
+    def error(self) :
+        print('Mean Absolute Error:', metrics.mean_absolute_error(self.y_test, self.prediccion())) 
+        print('Mean Squared Error:', metrics.mean_squared_error(self.y_test, self.prediccion())) 
+        print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(self.y_test,self.prediccion())))
      
 
       
