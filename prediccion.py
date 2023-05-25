@@ -16,7 +16,7 @@ from sklearn.compose import make_column_transformer
 from statistics import mean
 import statsmodels.api as sm
 
-class Prediccion:
+class RegresionLineal:
 
     X=None
     Y=None
@@ -58,6 +58,13 @@ class Prediccion:
         columnasNoNumericas = columnasNoNumericas.columns.tolist()
         return columnasNoNumericas
     ##2opcionaB
+
+    ##2opcionAa 
+ 
+
+
+
+
     def conversionDeCategorioADummieNumerico(self) :
         onehotencoder = make_column_transformer((OneHotEncoder(), self.columnasCategorica()), remainder = "passthrough")
         self.X = onehotencoder.fit_transform(self.X)
@@ -101,8 +108,53 @@ class Prediccion:
         plt.grid(which='minor', linestyle=':', linewidth='0.5', color='black')
         plt.show()
     #8
-    def pDeterminacion(self):
+
+    def regresionOLS(self) :
+        return sm.OLS(endog = self.Y, exog = self.X_Aux).fit()
+
+    def regresionOLSResultados(self):
+        return self.regresionOLS().summary()
         
-        regression_OLS = sm.OLS(endog = self.Y, exog = self.X_Aux).fit()
-        return regression_OLS.summary()
+    def todosLosP(self) :
+        valores = self.regresionOLS().pvalues
+        valores_formateados = valores.apply(lambda x: "{:.3f}".format(x))
+        pMayorASL = valores > 0.05
+        df = pd.DataFrame({'P-Values': valores_formateados, 'P>'+str(self.SL): pMayorASL})
         
+        df.reset_index(inplace=True)
+        # Eliminar la columna adicional de índices asignados por el OLS (x1,x2,x3,x4)
+        df.drop('index', axis=1, inplace=True)
+        # Asignar índices numéricos basados en la ubicación
+        df.index = range(len(df))
+
+
+        return df
+    
+    def todosLosPQueSuperaAlSL(self) :
+        return  self.todosLosP().loc[self.todosLosP()['P>'+str(self.SL)] == True]
+    
+    def obtenerIndicesDeAquellosQueSuperanAlLS(self):
+        return self.todosLosPQueSuperaAlSL().index.tolist()
+    
+    def eliminarColumnasQueSuperenAlSL(self) :
+       columnasAEliminar = self. obtenerIndicesDeAquellosQueSuperanAlLS()
+       self.X_Aux = np.delete(self.X_Aux, columnasAEliminar, axis=1)
+
+    def XAuxAsignacion(self) :
+        self.X = self.X_Aux
+
+    def realizarEntrenamientoCompleto(self) :
+        self.divisionDeConjuntos()
+        self.entrenar()
+        self.prediccion()
+     
+
+      
+        
+        
+
+
+
+
+
+      
