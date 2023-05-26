@@ -36,7 +36,7 @@ class RegresionLineal:
        
     #1
     def asignarDataFrame(self,archivo) : 
-        self.df = pd.read_csv(archivo)
+        self.df = archivo
 
     def obtenerListaDeColumnasDF(self):
         return self.df.columns.tolist()
@@ -84,6 +84,7 @@ class RegresionLineal:
         self.X =  self.X[:,1:]
     ##3
     def divisionDeConjuntos(self) :
+
         self.X_train, self.X_test, self.y_train,self.y_test = train_test_split(self.X, self.Y, test_size=0.2, random_state=0)
 
     ##4
@@ -150,7 +151,7 @@ class RegresionLineal:
     def XAuxAsignacion(self) :
         self.X = self.X_Aux
 
-    def realizarEntrenamientoCompleto(self,conEscalado) :
+    def realizarEntrenamientoCompleto(self) :
 
         self.divisionDeConjuntos()
         self.entrenar()
