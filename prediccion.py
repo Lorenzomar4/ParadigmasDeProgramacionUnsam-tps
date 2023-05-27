@@ -16,6 +16,9 @@ from sklearn.compose import make_column_transformer
 from statistics import mean
 import statsmodels.api as sm
 
+from algoritmos import RegresionMultiple
+
+
 class RegresionLineal:
 
     X=None
@@ -25,10 +28,10 @@ class RegresionLineal:
     X_test = None
     y_train = None , 
     y_test = None
-    regressor = None
     SL = 0.05
     X_Aux = None
     listaColumnaCategorica = None
+    algoritmo = RegresionMultiple()
     
     def __init__(self, archivo : str):
         self = self
@@ -84,13 +87,11 @@ class RegresionLineal:
 
     ##4
     def entrenar(self) :
-        self.regressor = LinearRegression()
-        self.regressor.fit(self.X_train, self.y_train)
+        self.algoritmo.entrenar(self)
         
     ##5
     def prediccion(self) :
-        y_pred = self.regressor.predict(self.X_test).flatten()
-        return y_pred
+        return self.algoritmo.preddiccion(self)
     
     ##6
     def resultadoDeEntrenamiento(self) :
@@ -104,6 +105,7 @@ class RegresionLineal:
         errorDePrediccion = 100-eficaciaDePrediccion
         dff = pd.DataFrame({'Actual': y_test, 'Prediccion':y_pred,"Diferencia": diferencia,"Diferencia porcentual %":diferenciaPorcentual,"Eficacia de prediccion %":eficaciaDePrediccion,"Error porcentual  de prediccion %":errorDePrediccion})
         return dff
+    
     #7
     def graficoActualPrediccion(self):
         df1 = self.resultadoDeEntrenamiento()  
@@ -159,8 +161,7 @@ class RegresionLineal:
      
 
       
-        
-        
+
 
 
 
