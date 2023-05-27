@@ -70,16 +70,11 @@ class RegresionLineal:
         return pd.concat([pd.DataFrame(self.X[columna]),self.df[columna] ], axis=1).head()
 
 
-
-
-
     def conversionDeCategorioADummieNumerico(self) :
         onehotencoder = make_column_transformer((OneHotEncoder(), self.listaColumnaCategorica), remainder = "passthrough")
         self.X = onehotencoder.fit_transform(self.X)
         self.X_Aux =self.X
-        
-        #chequeamos el resultado observando una porción
-        return  self.X  ##pd.concat([pd.DataFrame(self.X),self.df.iloc[:, :-1]], axis=1).head()
+        return  self.X  
     def evitarTrampa(self)  :
         self.X =  self.X[:,1:]
     ##3
