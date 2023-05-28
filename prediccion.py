@@ -32,6 +32,7 @@ class RegresionLineal:
     X_Aux = None
     listaColumnaCategorica = None
     algoritmo = RegresionMultiple()
+    y_pred=None
     
     def __init__(self, archivo : str):
         self = self
@@ -91,21 +92,20 @@ class RegresionLineal:
         
     ##5
     def prediccion(self) :
-        return self.algoritmo.prediccion(self)
+        self.y_pred= self.algoritmo.prediccion(self)
     
     ##6
     def resultadoDeEntrenamiento(self) :
-        y_pred = self.prediccion()
         y_test = np.ravel(self.y_test) ##EVITA ERRORES. 
 
         pd.set_option('display.float_format', lambda x: '{:.2f}'.format(x)) ##PARA EVITAR LA NOTACION CIENTIFICA
-        dff = pd.DataFrame({'Actual': y_test, 'Prediccion':y_pred})
+        dff = pd.DataFrame({'Actual': y_test, 'Prediccion':self.y_pred})
         diferencia = abs(dff['Prediccion']-dff['Actual'])
         diferenciaPorcentual=abs(((dff['Prediccion']*100)/(dff['Actual']))-100)
         eficaciaDePrediccion = np.where(diferenciaPorcentual <= 100 , 100-diferenciaPorcentual ,
                                         np.where(diferenciaPorcentual==0 ,100 , 100/diferenciaPorcentual) )
         errorDePrediccion = 100-eficaciaDePrediccion
-        dff = pd.DataFrame({'Actual': y_test, 'Prediccion':y_pred,"Diferencia": diferencia,"Diferencia porcentual %":diferenciaPorcentual,"Eficacia de prediccion %":eficaciaDePrediccion,"Error porcentual  de prediccion %":errorDePrediccion})
+        dff = pd.DataFrame({'Actual': y_test, 'Prediccion':self.y_pred,"Diferencia": diferencia,"Diferencia porcentual %":diferenciaPorcentual,"Eficacia de prediccion %":eficaciaDePrediccion,"Error porcentual  de prediccion %":errorDePrediccion})
         return dff
     
     #7
@@ -126,7 +126,7 @@ class RegresionLineal:
 
     def graficoRegresionPrediccion(self) :
        actual = np.squeeze(self.y_test)
-       preddiccion = np.squeeze(self.prediccion())
+       preddiccion = np.squeeze(self.y_pred)
 
       # Ajustar la recta de regresión lineal
        coefficients = np.polyfit(actual, preddiccion, 1)
@@ -153,7 +153,7 @@ class RegresionLineal:
     def graficoPrediccion2(self) :
         # Datos actual y_predicho
         actual = np.squeeze(self.y_test[:50])
-        preddiccion = np.squeeze(self.prediccion()[:50])
+        preddiccion = np.squeeze(self.y_pred[:50])
 
         # Crear una lista de índices para el eje x
         x = range(len(actual))
@@ -217,14 +217,14 @@ class RegresionLineal:
         self.entrenar()
         self.prediccion()
 
-    def error(self) :
+    def errorYEfectividad(self) :
         promedioDePrecios  = self.df['price'].mean()
-        mean_squared_error = np.sqrt(metrics.mean_squared_error(self.y_test,self.prediccion()))
+        mean_squared_error = np.sqrt(metrics.mean_squared_error(self.y_test,self.y_pred))
 
         errorDePromedioDePrediccionn = (mean_squared_error*100)/promedioDePrecios
 
-        print('Mean Absolute Error:', metrics.mean_absolute_error(self.y_test, self.prediccion())) 
-        print('Mean Squared Error:', metrics.mean_squared_error(self.y_test, self.prediccion())) 
+        print('Mean Absolute Error:', metrics.mean_absolute_error(self.y_test, self.y_pred)) 
+        print('Mean Squared Error:', metrics.mean_squared_error(self.y_test, self.y_pred)) 
         print('Root Mean Squared Error:', mean_squared_error)
         print("Error promedio de prediccion :",errorDePromedioDePrediccionn)
         print("Efectividad de la prediccion: ",100-errorDePromedioDePrediccionn)

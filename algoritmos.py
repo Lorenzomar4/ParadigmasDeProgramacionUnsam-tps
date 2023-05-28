@@ -1,4 +1,5 @@
 
+from sklearn.discriminant_analysis import StandardScaler
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
 
@@ -9,16 +10,20 @@ import numpy as np
 import matplotlib.pyplot as plt 
 import seaborn as seabornInstance
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
-from sklearn import metrics
 from sklearn.preprocessing import LabelEncoder
-
-
 
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import make_column_transformer
 from statistics import mean
 import statsmodels.api as sm
+
+import seaborn as sns
+from scipy import stats
+import warnings
+warnings.filterwarnings("ignore")
+
+from sklearn.svm import SVR
+
 
 class EstrategiaDePrediccion():
     def entrenar(self,regresionLineal ):
@@ -62,7 +67,40 @@ class RegresionPolinomica(EstrategiaDePrediccion) :
     
         return y_pred
     
+
+
+## REGRESION SVR ## REGRESION SVR ## REGRESION SVR ## REGRESION SVR ## REGRESION SVR ## REGRESION SVR ## REGRESION SVR ## REGRESION SVR 
+
+   
     
+class RegresionSVR(EstrategiaDePrediccion):
+    sc_X = StandardScaler()
+    sc_y = StandardScaler()
+   
+    regression = None  
+
+    def __init__(self, kernel ):
+        self = self
+        self.regression = kernel
+       
+    def entrenar(self, regresionLineal):
+        X = self.sc_X.fit_transform(regresionLineal.X_train)
+        y = self.sc_y.fit_transform(regresionLineal.y_train.values.reshape(-1, 1))
+        self.regression.fit(X, y)
+
+    def prediccion(self, regresionLineal):
+        X_test = self.sc_X.transform(regresionLineal.X_test)
+        y_pred = self.regression.predict(X_test)
+        y_pred = self.sc_y.inverse_transform(y_pred.reshape(-1, 1))
+
+        return y_pred.flatten()
+    
+
+
+
+
+
+
        
 
         
