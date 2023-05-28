@@ -98,9 +98,6 @@ class RegresionLineal:
         y_pred = self.prediccion()
         y_test = np.ravel(self.y_test) ##EVITA ERRORES. 
 
-
-     
-
         pd.set_option('display.float_format', lambda x: '{:.2f}'.format(x)) ##PARA EVITAR LA NOTACION CIENTIFICA
         dff = pd.DataFrame({'Actual': y_test, 'Prediccion':y_pred})
         diferencia = abs(dff['Prediccion']-dff['Actual'])
@@ -112,6 +109,13 @@ class RegresionLineal:
         return dff
     
     #7
+
+    def todasLasComparacionesDeActualPrediccion(self) :
+        self.graficoActualPrediccion()
+        self.graficoRegresionPrediccion()
+        self.graficoPrediccion2()
+
+
     def graficoActualPrediccion(self):
         df1 = self.resultadoDeEntrenamiento()  
         df1 = df1.loc[:, ['Actual', 'Prediccion']].head(80)  
@@ -119,7 +123,57 @@ class RegresionLineal:
         plt.grid(which='major', linestyle='-', linewidth='0.5', color='green')
         plt.grid(which='minor', linestyle=':', linewidth='0.5', color='black')
         plt.show()
-    #8
+
+    def graficoRegresionPrediccion(self) :
+       actual = np.squeeze(self.y_test)
+       preddiccion = np.squeeze(self.prediccion())
+
+      # Ajustar la recta de regresión lineal
+       coefficients = np.polyfit(actual, preddiccion, 1)
+       regression_line = np.polyval(coefficients, actual)
+
+        # Gráfico de dispersión
+       plt.scatter(actual, preddiccion, label='Datos')
+
+        # Línea de regresión
+       plt.plot(actual, regression_line, color='red', label='Recta de regresión')
+
+        # Etiquetas de los ejes y título del gráfico
+       plt.xlabel('Precio actual ')
+       plt.ylabel('precio Predicho')
+       plt.title('Comparación Precio actual y precio Predicho')
+
+        # Mostrar la leyenda
+       plt.legend()
+
+        # Mostrar el gráfico
+       plt.show()
+
+
+    def graficoPrediccion2(self) :
+        # Datos actual y_predicho
+        actual = np.squeeze(self.y_test[:50])
+        preddiccion = np.squeeze(self.prediccion()[:50])
+
+        # Crear una lista de índices para el eje x
+        x = range(len(actual))
+        plt.figure(figsize=(15, 10)) 
+        # Graficar y_actual y y_predicho
+        plt.plot(x, actual, label='Actual')
+        plt.plot(x, preddiccion, label='Predicho')
+
+        # Etiquetas de los ejes y título del gráfico
+        plt.xlabel('Índice')
+        plt.ylabel('Valor')
+        plt.title('Comparación entre Precio actual  y precio Predicho')
+
+        # Mostrar la leyenda
+        plt.legend()
+       
+
+        # Mostrar el gráfico
+        plt.show()
+    
 
     def regresionOLS(self) :
         return sm.OLS(endog = self.Y, exog = self.X_Aux).fit()
@@ -164,9 +218,17 @@ class RegresionLineal:
         self.prediccion()
 
     def error(self) :
+        promedioDePrecios  = self.df['price'].mean()
+        mean_squared_error = np.sqrt(metrics.mean_squared_error(self.y_test,self.prediccion()))
+
+        errorDePromedioDePrediccionn = (mean_squared_error*100)/promedioDePrecios
+
         print('Mean Absolute Error:', metrics.mean_absolute_error(self.y_test, self.prediccion())) 
         print('Mean Squared Error:', metrics.mean_squared_error(self.y_test, self.prediccion())) 
-        print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(self.y_test,self.prediccion())))
+        print('Root Mean Squared Error:', mean_squared_error)
+        print("Error promedio de prediccion :",errorDePromedioDePrediccionn)
+        print("Efectividad de la prediccion: ",100-errorDePromedioDePrediccionn)
+        
      
 
       
