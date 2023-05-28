@@ -91,17 +91,22 @@ class RegresionLineal:
         
     ##5
     def prediccion(self) :
-        return self.algoritmo.preddiccion(self)
+        return self.algoritmo.prediccion(self)
     
     ##6
     def resultadoDeEntrenamiento(self) :
         y_pred = self.prediccion()
         y_test = np.ravel(self.y_test) ##EVITA ERRORES. 
+
+
+     
+
         pd.set_option('display.float_format', lambda x: '{:.2f}'.format(x)) ##PARA EVITAR LA NOTACION CIENTIFICA
         dff = pd.DataFrame({'Actual': y_test, 'Prediccion':y_pred})
         diferencia = abs(dff['Prediccion']-dff['Actual'])
         diferenciaPorcentual=abs(((dff['Prediccion']*100)/(dff['Actual']))-100)
-        eficaciaDePrediccion = np.where(diferenciaPorcentual <= 100 , 100-diferenciaPorcentual , 100/diferenciaPorcentual)
+        eficaciaDePrediccion = np.where(diferenciaPorcentual <= 100 , 100-diferenciaPorcentual ,
+                                        np.where(diferenciaPorcentual==0 ,100 , 100/diferenciaPorcentual) )
         errorDePrediccion = 100-eficaciaDePrediccion
         dff = pd.DataFrame({'Actual': y_test, 'Prediccion':y_pred,"Diferencia": diferencia,"Diferencia porcentual %":diferenciaPorcentual,"Eficacia de prediccion %":eficaciaDePrediccion,"Error porcentual  de prediccion %":errorDePrediccion})
         return dff
@@ -151,6 +156,10 @@ class RegresionLineal:
     def realizarEntrenamientoCompleto(self) :
 
         self.divisionDeConjuntos()
+        self.entrenar()
+        self.prediccion()
+
+    def realizarEntrenamientoSinDivisionDeConjuntos(self):
         self.entrenar()
         self.prediccion()
 
