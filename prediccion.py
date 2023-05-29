@@ -104,18 +104,13 @@ class RegresionLineal:
         dff = pd.DataFrame({'Actual': y_test, 'Prediccion':self.y_pred})
         diferencia = abs(dff['Prediccion']-dff['Actual'])
         diferenciaPorcentual=abs(((dff['Prediccion']*100)/(dff['Actual']))-100)
-        condicion = (diferenciaPorcentual <= 100) & (diferenciaPorcentual > 0)
-        eficaciaDePrediccion = np.where( condicion, 100-diferenciaPorcentual ,
-                                        np.where(diferenciaPorcentual==0 ,100 , 100/diferenciaPorcentual) )
-        errorDePrediccion = 100-eficaciaDePrediccion
+        
 
         
         dff = pd.DataFrame({'Actual': y_test, 
                             'Prediccion':self.y_pred,
-                            "Diferencia Absoluta": diferencia,
-                            "Diferencia porcentual absoluta %":diferenciaPorcentual,
-                            "Eficacia de prediccion absoluta %":eficaciaDePrediccion,
-                            "Error absoluto de prediccion %":errorDePrediccion
+                            "Error Absoluta": diferencia,
+                            "Error porcentual absoluto %":diferenciaPorcentual           
                             })
         return dff
  
