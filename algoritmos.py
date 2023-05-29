@@ -22,6 +22,13 @@ from scipy import stats
 import warnings
 warnings.filterwarnings("ignore")
 
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+from sklearn.tree import DecisionTreeRegressor
+import warnings
+from sklearn.ensemble import RandomForestRegressor
+
 from sklearn.svm import SVR
 
 
@@ -67,12 +74,8 @@ class RegresionPolinomica(EstrategiaDePrediccion) :
     
         return y_pred
     
-
-
 ## REGRESION SVR ## REGRESION SVR ## REGRESION SVR ## REGRESION SVR ## REGRESION SVR ## REGRESION SVR ## REGRESION SVR ## REGRESION SVR 
 
-   
-    
 class RegresionSVR(EstrategiaDePrediccion):
     sc_X = StandardScaler()
     sc_y = StandardScaler()
@@ -95,7 +98,23 @@ class RegresionSVR(EstrategiaDePrediccion):
 
         return y_pred.flatten()
     
+class ReresionConArboles(EstrategiaDePrediccion):
 
+    regression =None
+    
+    def __init__(self, tipoDeArbolDeRegression ):
+        self = self
+        self.regression = tipoDeArbolDeRegression
+
+    regression = DecisionTreeRegressor(random_state = 0)
+    
+    def entrenar(self, regresionLineal):
+        self.regression.fit(regresionLineal.X_train, regresionLineal.y_train)
+
+    
+    def prediccion(self, regresionLineal):
+        y_pred = self.regression.predict(regresionLineal.X_test)
+        return  y_pred
 
 
 

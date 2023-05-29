@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np 
 import matplotlib.pyplot as plt 
 import seaborn as seabornInstance
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import LeaveOneOut, train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn import metrics
 from sklearn.preprocessing import LabelEncoder
@@ -102,10 +102,16 @@ class RegresionLineal:
         dff = pd.DataFrame({'Actual': y_test, 'Prediccion':self.y_pred})
         diferencia = abs(dff['Prediccion']-dff['Actual'])
         diferenciaPorcentual=abs(((dff['Prediccion']*100)/(dff['Actual']))-100)
-        eficaciaDePrediccion = np.where(diferenciaPorcentual <= 100 , 100-diferenciaPorcentual ,
+        condicion = (diferenciaPorcentual <= 100) & (diferenciaPorcentual > 0)
+        eficaciaDePrediccion = np.where( condicion, 100-diferenciaPorcentual ,
                                         np.where(diferenciaPorcentual==0 ,100 , 100/diferenciaPorcentual) )
         errorDePrediccion = 100-eficaciaDePrediccion
-        dff = pd.DataFrame({'Actual': y_test, 'Prediccion':self.y_pred,"Diferencia": diferencia,"Diferencia porcentual %":diferenciaPorcentual,"Eficacia de prediccion %":eficaciaDePrediccion,"Error porcentual  de prediccion %":errorDePrediccion})
+        dff = pd.DataFrame({'Actual': y_test, 
+                            'Prediccion':self.y_pred,
+                            "Diferencia": diferencia,
+                            "Diferencia porcentual %":diferenciaPorcentual,
+                            "Eficacia de prediccion %":eficaciaDePrediccion,
+                            "Error porcentual  de prediccion %":errorDePrediccion})
         return dff
     
     #7
