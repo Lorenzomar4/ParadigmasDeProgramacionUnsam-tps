@@ -31,6 +31,16 @@ from sklearn.ensemble import RandomForestRegressor
 
 from sklearn.svm import SVR
 
+import pandas as pd
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import GridSearchCV
+from math import sqrt
+import matplotlib.pyplot as plt
+
+
 
 class EstrategiaDePrediccion():
     def entrenar(self,regresionLineal ):
@@ -115,6 +125,52 @@ class ReresionConArboles(EstrategiaDePrediccion):
     def prediccion(self, regresionLineal):
         y_pred = self.regression.predict(regresionLineal.X_test)
         return  y_pred
+
+class DataKNN() :
+    K = None
+    rmseValor = None
+    y_pred = None
+
+
+    def __init__(self, K,rmseValor,y_pred ):
+        self = self
+        self.K = K
+        self.rmseValor = rmseValor
+        self.y_pred=y_pred
+
+
+class RegresionKNN(EstrategiaDePrediccion):
+
+    listaDataKNN = []
+
+    def entrenar(self, regresionLineal):
+        for K in range(20):
+            K = K+1
+            model = KNeighborsRegressor(n_neighbors = K)
+            model.fit(regresionLineal.X_train, regresionLineal.y_train) # fit 
+            y_pred=model.predict(regresionLineal.X_test).flatten() # hacer predicciones en el conjunto de prueba
+            rmseValor = sqrt(mean_squared_error(regresionLineal.y_test,y_pred)) # calcular rmse
+            self.listaDataKNN.append(DataKNN(K,rmseValor,y_pred))
+            print(f'Valor RMSE para k = ' ,K , 'es:', rmseValor)      
+    
+    def dataKNNDefinitivo(self) -> DataKNN  : 
+        dataKNNDefinitivo : DataKNN= min(self.listaDataKNN, key=lambda x: x.rmseValor)
+        print("El K seleccionado por tener el valor RMSE minomo es : ",dataKNNDefinitivo.K,"con un RMSE De : ",dataKNNDefinitivo.rmseValor)
+        return dataKNNDefinitivo 
+   
+    
+    def prediccion(self, regresionLineal):
+        return  self.dataKNNDefinitivo().y_pred
+    
+    
+
+    
+
+    
+    
+
+
+ 
 
 
 
