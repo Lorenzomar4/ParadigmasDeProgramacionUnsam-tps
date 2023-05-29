@@ -18,7 +18,9 @@ import statsmodels.api as sm
 
 from algoritmos import RegresionMultiple
 
-
+from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import GridSearchCV
+from math import sqrt
 class RegresionLineal:
 
     X=None
@@ -106,14 +108,18 @@ class RegresionLineal:
         eficaciaDePrediccion = np.where( condicion, 100-diferenciaPorcentual ,
                                         np.where(diferenciaPorcentual==0 ,100 , 100/diferenciaPorcentual) )
         errorDePrediccion = 100-eficaciaDePrediccion
+
+        
         dff = pd.DataFrame({'Actual': y_test, 
                             'Prediccion':self.y_pred,
-                            "Diferencia": diferencia,
-                            "Diferencia porcentual %":diferenciaPorcentual,
-                            "Eficacia de prediccion %":eficaciaDePrediccion,
-                            "Error porcentual  de prediccion %":errorDePrediccion})
+                            "Diferencia Absoluta": diferencia,
+                            "Diferencia porcentual absoluta %":diferenciaPorcentual,
+                            "Eficacia de prediccion absoluta %":eficaciaDePrediccion,
+                            "Error absoluto de prediccion %":errorDePrediccion
+                            })
         return dff
-    
+ 
+
     #7
 
     def todasLasComparacionesDeActualPrediccion(self) :
@@ -232,12 +238,32 @@ class RegresionLineal:
         print('Mean Absolute Error:', metrics.mean_absolute_error(self.y_test, self.y_pred)) 
         print('Mean Squared Error:', metrics.mean_squared_error(self.y_test, self.y_pred)) 
         print('Root Mean Squared Error:', mean_squared_error)
-        print("Error promedio de prediccion :",errorDePromedioDePrediccionn)
-        print("Efectividad de la prediccion: ",100-errorDePromedioDePrediccionn)
+        print("Error cuadratico promedio de prediccion :",errorDePromedioDePrediccionn)
+        print("Efectividad cuadratica de la prediccion: ",100-errorDePromedioDePrediccionn)
         
-     
+    def conclusiones(self) :
 
-      
+        mean_absolute_error = metrics.mean_absolute_error(self.y_test, self.y_pred)
+        mean_squared_error = metrics.mean_squared_error(self.y_test, self.y_pred)
+        root_mean_squared_error = np.sqrt(mean_squared_error)
+        promedioDePrecios = self.df['price'].mean()
+        errorCuadraticoPorcentaje = (root_mean_squared_error * 100) / promedioDePrecios
+        efectividadCuadraticaPrediccion = 100 - errorCuadraticoPorcentaje
+
+
+        errorAbsolutoPorcentaje = (mean_absolute_error * 100) / promedioDePrecios
+        efectividadAbsolutaPrediccion = 100 - errorAbsolutoPorcentaje
+
+        # Crea el DataFrame con los resultados
+        data = {
+         'Media': [mean_absolute_error,root_mean_squared_error,mean_squared_error ] ,
+         'Error %' : [errorAbsolutoPorcentaje,errorCuadraticoPorcentaje,np.nan] ,
+         'Efectividad %' : [efectividadAbsolutaPrediccion,efectividadCuadraticaPrediccion,np.nan]
+        }
+
+        df = pd.DataFrame(data, index=['Mean Absolute Error','Root Mean Squared Error', 'Mean Squared Error'])
+        return df
+
 
 
 
