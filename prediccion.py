@@ -258,6 +258,11 @@ class RegresionLineal:
 
         df = pd.DataFrame(data, index=['Mean Absolute Error','Root Mean Squared Error', 'Mean Squared Error'])
         return df
+    
+    def prePrediccionCompleto(self,variableDependiente : str, listaVariableIndCategoricos ) :
+        self.definirConjuntoDeVariablesIndependientesYDependientes(variableDependiente)
+
+
 
 
 
