@@ -16,12 +16,12 @@ from sklearn.compose import make_column_transformer
 from statistics import mean
 import statsmodels.api as sm
 
-from algoritmos import RegresionMultiple
+from algoritmos import RegresionLineal
 
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import GridSearchCV
 from math import sqrt
-class RegresionLineal:
+class RegresionModelo:
 
     X=None
     Y=None
@@ -31,9 +31,9 @@ class RegresionLineal:
     y_train = None , 
     y_test = None
     SL = 0.05
-    X_Aux = None
+
     listaColumnaCategorica = None
-    algoritmo = RegresionMultiple()
+    algoritmo = RegresionLineal()
     y_pred=None
     
     def __init__(self, archivo : str):
@@ -53,7 +53,7 @@ class RegresionLineal:
         return columnas
 
     ##2
-    def definirConjuntoDeVariablesIndependientesYDependientes(self : list, varDependiente: str):
+    def definirConjuntoDeVariablesIndependientesYDependientes(self, varDependiente: str):
         listaDeVariablesIndependientes : list = self.obtenerSoloListaDeVariablesIndependientes(varDependiente)
         self.X= self.df.loc[:,listaDeVariablesIndependientes] 
         self.Y = self.df.loc[:,[varDependiente]]
@@ -79,7 +79,7 @@ class RegresionLineal:
     def conversionDeCategorioADummieNumerico(self) :
         onehotencoder = make_column_transformer((OneHotEncoder(), self.listaColumnaCategorica), remainder = "passthrough")
         self.X = onehotencoder.fit_transform(self.X)
-        self.X_Aux =self.X
+     
         return  self.X  
     def evitarTrampa(self)  :
         self.X =  self.X[:,1:]
@@ -183,9 +183,13 @@ class RegresionLineal:
     
 
     def regresionOLS(self) :
-        return sm.OLS(endog = self.Y, exog = self.X_Aux).fit()
+      
+        return sm.OLS(endog = self.Y, exog = self.X).fit()
 
     def regresionOLSResultados(self):
+
+
+
         return self.regresionOLS().summary()
         
     def todosLosP(self) :
@@ -209,10 +213,9 @@ class RegresionLineal:
     
     def eliminarColumnasQueSuperenAlSL(self) :
        columnasAEliminar = self. obtenerIndicesDeAquellosQueSuperanAlLS()
-       self.X_Aux = np.delete(self.X_Aux, columnasAEliminar, axis=1)
+       self.X = np.delete(self.X, columnasAEliminar, axis=1)
 
-    def XAuxAsignacion(self) :
-        self.X = self.X_Aux
+  
 
     def realizarEntrenamientoCompleto(self) :
 
@@ -223,19 +226,7 @@ class RegresionLineal:
     def realizarEntrenamientoSinDivisionDeConjuntos(self):
         self.entrenar()
         self.prediccion()
-
-    def errorYEfectividad(self) :
-        promedioDePrecios  = self.df['price'].mean()
-        mean_squared_error = np.sqrt(metrics.mean_squared_error(self.y_test,self.y_pred))
-
-        errorDePromedioDePrediccionn = (mean_squared_error*100)/promedioDePrecios
-
-        print('Mean Absolute Error:', metrics.mean_absolute_error(self.y_test, self.y_pred)) 
-        print('Mean Squared Error:', metrics.mean_squared_error(self.y_test, self.y_pred)) 
-        print('Root Mean Squared Error:', mean_squared_error)
-        print("Error cuadratico promedio de prediccion :",errorDePromedioDePrediccionn)
-        print("Efectividad cuadratica de la prediccion: ",100-errorDePromedioDePrediccionn)
-        
+  
     def conclusiones(self) :
 
         mean_absolute_error = metrics.mean_absolute_error(self.y_test, self.y_pred)
@@ -259,8 +250,8 @@ class RegresionLineal:
         df = pd.DataFrame(data, index=['Mean Absolute Error','Root Mean Squared Error', 'Mean Squared Error'])
         return df
     
-    def prePrediccionCompleto(self,variableDependiente : str, listaVariableIndCategoricos ) :
-        self.definirConjuntoDeVariablesIndependientesYDependientes(variableDependiente)
+
+        
 
 
 

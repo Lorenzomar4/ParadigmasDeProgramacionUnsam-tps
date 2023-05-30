@@ -42,24 +42,24 @@ import matplotlib.pyplot as plt
 
 
 
-class EstrategiaDePrediccion():
-    def entrenar(self,regresionLineal ):
+class TipoDeRegresion():
+    def entrenar(self,RegresionModelo ):
         pass
 
-    def prediccion(self,regresionLineal):
+    def prediccion(self,RegresionModelo):
         pass
 
-class RegresionMultiple(EstrategiaDePrediccion):
+class RegresionLineal(TipoDeRegresion):
     regressor = LinearRegression()
-    def entrenar(self,regresionLineal):
-        self.regressor.fit(regresionLineal.X_train, regresionLineal.y_train)
+    def entrenar(self,RegresionModelo):
+        self.regressor.fit(RegresionModelo.X_train, RegresionModelo.y_train)
 
-    def prediccion(self,regresionLineal):
-        y_pred = self.regressor.predict(regresionLineal.X_test).flatten()
+    def prediccion(self,RegresionModelo):
+        y_pred = self.regressor.predict(RegresionModelo.X_test).flatten()
         return y_pred
     
 
-class RegresionPolinomica(EstrategiaDePrediccion) :
+class RegresionPolinomica(TipoDeRegresion) :
 
     regressor = LinearRegression()
     grado = None
@@ -69,24 +69,24 @@ class RegresionPolinomica(EstrategiaDePrediccion) :
         self = self
         self.grado = grado
     
-    def crearPolinomio(self,regresionLineal) :
+    def crearPolinomio(self,RegresionModelo) :
         poly_reg = PolynomialFeatures(degree=self.grado)
-        self.X_poly = poly_reg.fit_transform(regresionLineal.X_train)
+        self.X_poly = poly_reg.fit_transform(RegresionModelo.X_train)
 
-    def entrenar(self, regresionLineal):
-        self.crearPolinomio(regresionLineal)
-        self.regressor.fit(self.X_poly, regresionLineal.y_train)
+    def entrenar(self, RegresionModelo):
+        self.crearPolinomio(RegresionModelo)
+        self.regressor.fit(self.X_poly, RegresionModelo.y_train)
 
-    def prediccion(self, regresionLineal):
+    def prediccion(self, RegresionModelo):
         poly_reg = PolynomialFeatures(degree=self.grado)
-        X_poly_test = poly_reg.fit_transform(regresionLineal.X_test)
+        X_poly_test = poly_reg.fit_transform(RegresionModelo.X_test)
         y_pred = self.regressor.predict(X_poly_test).flatten()
     
         return y_pred
     
 ## REGRESION SVR ## REGRESION SVR ## REGRESION SVR ## REGRESION SVR ## REGRESION SVR ## REGRESION SVR ## REGRESION SVR ## REGRESION SVR 
 
-class RegresionSVR(EstrategiaDePrediccion):
+class RegresionSVR(TipoDeRegresion):
     sc_X = StandardScaler()
     sc_y = StandardScaler()
    
@@ -96,19 +96,19 @@ class RegresionSVR(EstrategiaDePrediccion):
         self = self
         self.regression = kernel
        
-    def entrenar(self, regresionLineal):
-        X = self.sc_X.fit_transform(regresionLineal.X_train)
-        y = self.sc_y.fit_transform(regresionLineal.y_train.values.reshape(-1, 1))
+    def entrenar(self, RegresionModelo):
+        X = self.sc_X.fit_transform(RegresionModelo.X_train)
+        y = self.sc_y.fit_transform(RegresionModelo.y_train.values.reshape(-1, 1))
         self.regression.fit(X, y)
 
-    def prediccion(self, regresionLineal):
-        X_test = self.sc_X.transform(regresionLineal.X_test)
+    def prediccion(self, RegresionModelo):
+        X_test = self.sc_X.transform(RegresionModelo.X_test)
         y_pred = self.regression.predict(X_test)
         y_pred = self.sc_y.inverse_transform(y_pred.reshape(-1, 1))
 
         return y_pred.flatten()
     
-class ReresionConArboles(EstrategiaDePrediccion):
+class ReresionConArboles(TipoDeRegresion):
 
     regression =None
     
@@ -118,12 +118,12 @@ class ReresionConArboles(EstrategiaDePrediccion):
 
     regression = DecisionTreeRegressor(random_state = 0)
     
-    def entrenar(self, regresionLineal):
-        self.regression.fit(regresionLineal.X_train, regresionLineal.y_train)
+    def entrenar(self, RegresionModelo):
+        self.regression.fit(RegresionModelo.X_train, RegresionModelo.y_train)
 
     
-    def prediccion(self, regresionLineal):
-        y_pred = self.regression.predict(regresionLineal.X_test)
+    def prediccion(self, RegresionModelo):
+        y_pred = self.regression.predict(RegresionModelo.X_test)
         return  y_pred
 
 class DataKNN() :
@@ -139,17 +139,17 @@ class DataKNN() :
         self.y_pred=y_pred
 
 
-class RegresionKNN(EstrategiaDePrediccion):
+class RegresionKNN(TipoDeRegresion):
 
     listaDataKNN = []
 
-    def entrenar(self, regresionLineal):
+    def entrenar(self, RegresionModelo):
         for K in range(20):
             K = K+1
             model = KNeighborsRegressor(n_neighbors = K)
-            model.fit(regresionLineal.X_train, regresionLineal.y_train) # fit 
-            y_pred=model.predict(regresionLineal.X_test).flatten() # hacer predicciones en el conjunto de prueba
-            rmseValor = sqrt(mean_squared_error(regresionLineal.y_test,y_pred)) # calcular rmse
+            model.fit(RegresionModelo.X_train, RegresionModelo.y_train) # fit 
+            y_pred=model.predict(RegresionModelo.X_test).flatten() # hacer predicciones en el conjunto de prueba
+            rmseValor = sqrt(mean_squared_error(RegresionModelo.y_test,y_pred)) # calcular rmse
             self.listaDataKNN.append(DataKNN(K,rmseValor,y_pred))
             print(f'Valor RMSE para k = ' ,K , 'es:', rmseValor)      
     
@@ -159,7 +159,7 @@ class RegresionKNN(EstrategiaDePrediccion):
         return dataKNNDefinitivo 
    
     
-    def prediccion(self, regresionLineal):
+    def prediccion(self, RegresionModelo):
         return  self.dataKNNDefinitivo().y_pred
     
     
