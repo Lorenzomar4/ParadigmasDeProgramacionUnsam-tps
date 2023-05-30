@@ -49,6 +49,9 @@ class TipoDeRegresion():
     def prediccion(self,RegresionModelo):
         pass
 
+    def nombreDeRegresion(self) :
+        pass
+
 class RegresionLineal(TipoDeRegresion):
     regressor = LinearRegression()
     def entrenar(self,RegresionModelo):
@@ -57,6 +60,8 @@ class RegresionLineal(TipoDeRegresion):
     def prediccion(self,RegresionModelo):
         y_pred = self.regressor.predict(RegresionModelo.X_test).flatten()
         return y_pred
+    def nombreDeRegresion(self):
+        return "Regresion Lineal"
     
 
 class RegresionPolinomica(TipoDeRegresion) :
@@ -68,6 +73,9 @@ class RegresionPolinomica(TipoDeRegresion) :
     def __init__(self, grado ):
         self = self
         self.grado = grado
+
+    def nombreDeRegresion(self):
+        return "Regresion Polinomica"
     
     def crearPolinomio(self,RegresionModelo) :
         poly_reg = PolynomialFeatures(degree=self.grado)
@@ -105,10 +113,12 @@ class RegresionSVR(TipoDeRegresion):
         X_test = self.sc_X.transform(RegresionModelo.X_test)
         y_pred = self.regression.predict(X_test)
         y_pred = self.sc_y.inverse_transform(y_pred.reshape(-1, 1))
-
         return y_pred.flatten()
     
-class ReresionConArboles(TipoDeRegresion):
+    def nombreDeRegresion(self):
+        return f"Regresion SVR con el Kernel : {self.regression.kernel}" 
+    
+class RegresionConArboles(TipoDeRegresion):
 
     regression =None
     
@@ -125,6 +135,13 @@ class ReresionConArboles(TipoDeRegresion):
     def prediccion(self, RegresionModelo):
         y_pred = self.regression.predict(RegresionModelo.X_test)
         return  y_pred
+    
+    def nombreDeRegresion(self):
+        tipoDeArbolDiccionario = {
+            "RandomForestRegressor": "Regresion con Random forest",
+            "DecisionTreeRegressor": "Regresion con Arboles de desicion"} 
+        tipo = self.regression.__class__.__name__
+        return tipoDeArbolDiccionario[tipo]
 
 class DataKNN() :
     K = None
@@ -155,12 +172,15 @@ class RegresionKNN(TipoDeRegresion):
     
     def dataKNNDefinitivo(self) -> DataKNN  : 
         dataKNNDefinitivo : DataKNN= min(self.listaDataKNN, key=lambda x: x.rmseValor)
-        print("El K seleccionado por tener el valor RMSE minomo es : ",dataKNNDefinitivo.K,"con un RMSE De : ",dataKNNDefinitivo.rmseValor)
+        print("El K seleccionado por tener el valor RMSE minimo es : ",dataKNNDefinitivo.K,"con un RMSE De : ",dataKNNDefinitivo.rmseValor)
         return dataKNNDefinitivo 
    
     
     def prediccion(self, RegresionModelo):
         return  self.dataKNNDefinitivo().y_pred
+    
+    def nombreDeRegresion(self):
+        return "Regresion con KNN"
     
     
 

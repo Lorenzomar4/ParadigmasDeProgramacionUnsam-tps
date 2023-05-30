@@ -8,7 +8,7 @@ from sklearn.model_selection import LeaveOneOut, train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn import metrics
 from sklearn.preprocessing import LabelEncoder
-
+import pickle
 
 
 from sklearn.preprocessing import OneHotEncoder
@@ -21,6 +21,12 @@ from algoritmos import RegresionLineal
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import GridSearchCV
 from math import sqrt
+
+from conclusion import ConclusionRegresion
+
+
+conclusion = ConclusionRegresion()
+
 class RegresionModelo:
 
     X=None
@@ -28,18 +34,30 @@ class RegresionModelo:
     df= None
     X_train = None
     X_test = None
-    y_train = None , 
+    y_train = None 
     y_test = None
     SL = 0.05
+
 
     listaColumnaCategorica = None
     algoritmo = RegresionLineal()
     y_pred=None
+
+    meanAbsoluteErrorPorcentajeDic = None
+    meanSquaredErrorPorcentajeDic = None
+    promedioAbsolutoEfectividadPorcentajeDic=None
+    promedioCuadraticoEfectividadPorcentajeDic = None
+
+    
+   
     
     def __init__(self, archivo : str):
         self = self
         self.df = archivo
-       
+        self.meanAbsoluteErrorPorcentajeDic = {}
+        self.meanSquaredErrorPorcentajeDic = {}
+        self.promedioAbsolutoEfectividadPorcentajeDic = {}
+        self.promedioCuadraticoEfectividadPorcentajeDic = {}
     #1
     def asignarDataFrame(self,archivo) : 
         self.df = archivo
@@ -109,7 +127,7 @@ class RegresionModelo:
         
         dff = pd.DataFrame({'Actual': y_test, 
                             'Prediccion':self.y_pred,
-                            "Error Absoluta": diferencia,
+                            "Error Absoluto": diferencia,
                             "Error porcentual absoluto %":diferenciaPorcentual           
                             })
         return dff
@@ -247,17 +265,23 @@ class RegresionModelo:
          'Efectividad %' : [efectividadAbsolutaPrediccion,efectividadCuadraticaPrediccion,np.nan]
         }
 
+        nombreDeRegresion = self.algoritmo.nombreDeRegresion()
+        
+        self.meanAbsoluteErrorPorcentajeDic[nombreDeRegresion]=errorAbsolutoPorcentaje
+        self.meanSquaredErrorPorcentajeDic[nombreDeRegresion]=errorCuadraticoPorcentaje
+        self.promedioAbsolutoEfectividadPorcentajeDic[nombreDeRegresion]=efectividadAbsolutaPrediccion
+        self.promedioCuadraticoEfectividadPorcentajeDic[nombreDeRegresion]=efectividadCuadraticaPrediccion
+        
+        self.guardarArchivo()
+
         df = pd.DataFrame(data, index=['Mean Absolute Error','Root Mean Squared Error', 'Mean Squared Error'])
         return df
-    
+
+    def guardarArchivo(self) :
+        with open('variable.pkl', 'wb') as f:
+            pickle.dump(self, f)
 
         
-
-
-
-
-
-
 
 
 
