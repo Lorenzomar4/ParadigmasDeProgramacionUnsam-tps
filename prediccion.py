@@ -22,11 +22,6 @@ from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import GridSearchCV
 from math import sqrt
 
-from conclusion import ConclusionRegresion
-
-
-conclusion = ConclusionRegresion()
-
 class RegresionModelo:
 
     X=None
@@ -43,6 +38,9 @@ class RegresionModelo:
     algoritmo = RegresionLineal()
     y_pred=None
 
+    mean_absolute_errorDic = None
+    mean_squared_errorDic = None
+    root_mean_squared_errorDic = None
     meanAbsoluteErrorPorcentajeDic = None
     meanSquaredErrorPorcentajeDic = None
     promedioAbsolutoEfectividadPorcentajeDic=None
@@ -58,6 +56,9 @@ class RegresionModelo:
         self.meanSquaredErrorPorcentajeDic = {}
         self.promedioAbsolutoEfectividadPorcentajeDic = {}
         self.promedioCuadraticoEfectividadPorcentajeDic = {}
+        self.mean_absolute_errorDic={}
+        self.mean_squared_errorDic={}
+        self.root_mean_squared_errorDic = {}
     #1
     def asignarDataFrame(self,archivo) : 
         self.df = archivo
@@ -139,6 +140,7 @@ class RegresionModelo:
         self.graficoActualPrediccion()
         self.graficoRegresionPrediccion()
         self.graficoPrediccion2()
+       
 
 
     def graficoActualPrediccion(self):
@@ -158,7 +160,7 @@ class RegresionModelo:
        regression_line = np.polyval(coefficients, actual)
 
         # Gráfico de dispersión
-       plt.scatter(actual, preddiccion, label='Datos')
+       plt.scatter(actual, preddiccion, label='Datos',s=1)
 
         # Línea de regresión
        plt.plot(actual, regression_line, color='red', label='Recta de regresión')
@@ -173,7 +175,8 @@ class RegresionModelo:
 
         # Mostrar el gráfico
        plt.show()
-
+  
+    
 
     def graficoPrediccion2(self) :
         # Datos actual y_predicho
@@ -266,6 +269,10 @@ class RegresionModelo:
         }
 
         nombreDeRegresion = self.algoritmo.nombreDeRegresion()
+
+        self.mean_absolute_errorDic[nombreDeRegresion] = mean_absolute_error
+        self.mean_squared_errorDic[nombreDeRegresion] = mean_squared_error
+        self.root_mean_squared_errorDic[nombreDeRegresion] = root_mean_squared_error
         
         self.meanAbsoluteErrorPorcentajeDic[nombreDeRegresion]=errorAbsolutoPorcentaje
         self.meanSquaredErrorPorcentajeDic[nombreDeRegresion]=errorCuadraticoPorcentaje
