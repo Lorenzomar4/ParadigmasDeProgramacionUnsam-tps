@@ -66,7 +66,7 @@ class RegresionLineal(TipoDeRegresion):
 
 class RegresionPolinomica(TipoDeRegresion) :
 
-    regressor = LinearRegression()
+
     grado = None
     X_poly = None
     
@@ -126,7 +126,6 @@ class RegresionConArboles(TipoDeRegresion):
         self = self
         self.regression = tipoDeArbolDeRegression
 
-    regression = DecisionTreeRegressor(random_state = 0)
     
     def entrenar(self, RegresionModelo):
         self.regression.fit(RegresionModelo.X_train, RegresionModelo.y_train)
