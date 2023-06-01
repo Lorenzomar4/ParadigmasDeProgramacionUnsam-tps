@@ -67,12 +67,15 @@ class RegresionModelo:
         return self.df.columns.tolist()
     
     def obtenerSoloListaDeVariablesIndependientes(self, dependiente : str) -> list:
+
+       
         columnas = self.obtenerListaDeColumnasDF()
         columnas.remove(dependiente)
         return columnas
 
     ##2
     def definirConjuntoDeVariablesIndependientesYDependientes(self, varDependiente: str):
+        
         listaDeVariablesIndependientes : list = self.obtenerSoloListaDeVariablesIndependientes(varDependiente)
         self.X= self.df.loc[:,listaDeVariablesIndependientes] 
         self.Y = self.df.loc[:,[varDependiente]]
@@ -154,25 +157,19 @@ class RegresionModelo:
     def graficoRegresionPrediccion(self) :
        actual = np.squeeze(self.y_test)
        preddiccion = np.squeeze(self.y_pred)
-
       # Ajustar la recta de regresión lineal
        coefficients = np.polyfit(actual, preddiccion, 1)
        regression_line = np.polyval(coefficients, actual)
-
         # Gráfico de dispersión
        plt.scatter(actual, preddiccion, label='Datos',s=1)
-
         # Línea de regresión
        plt.plot(actual, regression_line, color='red', label='Recta de regresión')
-
         # Etiquetas de los ejes y título del gráfico
        plt.xlabel('Precio actual ')
        plt.ylabel('precio Predicho')
        plt.title('Comparación Precio actual y precio Predicho')
-
         # Mostrar la leyenda
        plt.legend()
-
         # Mostrar el gráfico
        plt.show()
   
@@ -209,21 +206,25 @@ class RegresionModelo:
 
     def regresionOLSResultados(self):
 
-
-
         return self.regresionOLS().summary()
         
     def todosLosP(self) :
+        # Obtener los valores de p (p-values) de la regresion OLS
         valores = self.regresionOLS().pvalues
+        # Formatear los valores de p con tres decimales
         valores_formateados = valores.apply(lambda x: "{:.3f}".format(x))
+        # Verificar si los valores de p son mayores que el umbral de significancia (0.05)
         pMayorASL = valores > 0.05
+        # Crear un DataFrame con los valores de p formateados y la indicacion de si son mayores que el umbral
         df = pd.DataFrame({'P-Values': valores_formateados, 'P>'+str(self.SL): pMayorASL})
-        
+        # NECESITO SABER LOS INDICES DE CADA FILA YA QUE REPRESENTAN A SU VEZ EL INDICE DE COLUMNAS
+        # DE LAS VARIABLES INDEPENDIENTES. TENERLOS COMO X1,X2 X3 X4 no me sirve para nada para la el algoritmo de eliminacion
+        # 
         df.reset_index(inplace=True)
-        # Eliminar la columna adicional de índices asignados por el OLS (x1,x2,x3,x4)
         df.drop('index', axis=1, inplace=True)
-        # Asignar índices numéricos basados en la ubicación
+        # Reasignar un nuevo índice numérico al DataFrame
         df.index = range(len(df))
+        # se devuelve el DataFrame con los valores de p y su comparación con el umbral de significancia
         return df
     
     def todosLosPQueSuperaAlSL(self) :
