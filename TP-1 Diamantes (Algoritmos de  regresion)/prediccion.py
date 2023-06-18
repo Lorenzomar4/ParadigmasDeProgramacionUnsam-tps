@@ -234,7 +234,7 @@ class RegresionModelo:
         return self.todosLosPQueSuperaAlSL().index.tolist()
     
     def eliminarColumnasQueSuperenAlSL(self) :
-       columnasAEliminar = self. obtenerIndicesDeAquellosQueSuperanAlLS()
+       columnasAEliminar = self.obtenerIndicesDeAquellosQueSuperanAlLS()
        self.X = np.delete(self.X, columnasAEliminar, axis=1)
 
   
