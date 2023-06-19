@@ -1,5 +1,7 @@
 from operator import xor
 from os import O_TRUNC
+from matplotlib.colors import ListedColormap
+
 
 
 
@@ -16,14 +18,14 @@ from sklearn import metrics
 from sklearn.preprocessing import LabelEncoder
 import pickle
 import seaborn as sns
-
+from sklearn.metrics import accuracy_score
 
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import make_column_transformer
 from statistics import mean
 import statsmodels.api as sm
 
-from sklearn.metrics import classification_report, confusion_matrix, f1_score, mean_squared_error, precision_score, recall_score, roc_auc_score
+from sklearn.metrics import classification_report, confusion_matrix, f1_score, mean_absolute_error, mean_squared_error, precision_score, recall_score, roc_auc_score
 from sklearn.model_selection import GridSearchCV
 from math import sqrt
 
@@ -44,25 +46,10 @@ class ClasificacionModelo:
     y_pred=None
     variableDependiente =None
 
-    mean_absolute_errorDic = None
-    mean_squared_errorDic = None
-    root_mean_squared_errorDic = None
-    meanAbsoluteErrorPorcentajeDic = None
-    meanSquaredErrorPorcentajeDic = None
-    promedioAbsolutoEfectividadPorcentajeDic=None
-    promedioCuadraticoEfectividadPorcentajeDic = None
-
-    
     def __init__(self, archivo : str):
         self = self
         self.df = archivo
-        self.meanAbsoluteErrorPorcentajeDic = {}
-        self.meanSquaredErrorPorcentajeDic = {}
-        self.promedioAbsolutoEfectividadPorcentajeDic = {}
-        self.promedioCuadraticoEfectividadPorcentajeDic = {}
-        self.mean_absolute_errorDic={}
-        self.mean_squared_errorDic={}
-        self.root_mean_squared_errorDic = {}
+    
     #1
     def asignarDataFrame(self,archivo) : 
         self.df = archivo
@@ -116,7 +103,7 @@ class ClasificacionModelo:
         pd.set_option('display.float_format', lambda x: '{:.2f}'.format(x)) ##PARA EVITAR LA NOTACION CIENTIFICA
         dff = pd.DataFrame({'Actual': y_test, 'Prediccion':self.y_pred})
         diferencia = abs(dff['Prediccion']-dff['Actual'])
-        diferenciaPorcentual = abs(((dff['Prediccion'] * 100) / dff['Actual']) - 100)
+        diferenciaPorcentual = abs(((dff['Prediccion'] * 100) / abs(dff['Actual']) - 100))
         errorPorcentualAbsoluto = np.where(np.isnan(diferenciaPorcentual), 0, diferenciaPorcentual)
 
         
@@ -132,13 +119,8 @@ class ClasificacionModelo:
 
     #7
 
-    def todasLasComparacionesDeActualPrediccion(self) :
-        self.graficoComparativoBarras()
-        self.graficoComparativoLineas()
-        self.matrizDeConfusion()
-       
-
-
+   
+    
     def graficoComparativoBarras(self):
         df1 = self.resultadoDeEntrenamiento()  
         df1 = df1.loc[:, ['Actual', 'Prediccion']].head(80)  
@@ -147,7 +129,6 @@ class ClasificacionModelo:
         plt.grid(which='minor', linestyle=':', linewidth='0.5', color='black')
         plt.show()
 
-   
 
     def graficoComparativoLineas(self) :
         # Datos actual y_predicho
@@ -236,21 +217,20 @@ class ClasificacionModelo:
         self.prediccion()
 
 
-
-    def realizarEntrenamientoSinDivisionDeConjuntos(self):
-        self.entrenar()
-        self.prediccion()
-
-
     def metricas(self):
         report = classification_report(self.y_test, self.y_pred,digits=4)
-        mean_absolute_error = metrics.mean_absolute_error(self.y_test, self.y_pred)
-        promedioDePrecios = self.df[self.variableDependiente].mean()
-        errorAbsolutoPorcentaje = (mean_absolute_error * 100) / promedioDePrecios
-        print("error absoluto porcentaje :",errorAbsolutoPorcentaje)
-        print("error absoluto efectividad :",100-errorAbsolutoPorcentaje)
         print(report)
-       
+
+
+
+
+
+
+
+
+    
+
+   
         
 
   

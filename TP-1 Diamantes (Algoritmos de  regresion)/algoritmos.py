@@ -65,8 +65,6 @@ class RegresionLineal(TipoDeRegresion):
     
 
 class RegresionPolinomica(TipoDeRegresion) :
-
-
     grado = None
     X_poly = None
     
